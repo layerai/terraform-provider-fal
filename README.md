@@ -4,7 +4,7 @@ The [fal Terraform Provider](https://registry.terraform.io/providers/fal-ai/fal/
 
 ## Requirements
 
-You will need to [install uv](https://docs.astral.sh/uv/getting-started/installation/) into your Terraform host environment.
+To manage `fal_app` resources, you will need to [install uv](https://docs.astral.sh/uv/getting-started/installation/) into your Terraform host environment.
 
 If you're running Terraform in GitHub Actions, an example of this might look like:
 ```yaml
@@ -52,6 +52,22 @@ resource "fal_app" "sana_app" {
 }
 ```
 
+Manage the secrets fal injects into your apps, without uv:
+```terraform
+resource "fal_secret" "hf_token" {
+  name  = "HF_TOKEN"
+  value = var.hf_token
+}
+```
+
 Initialize your project by running `terraform init` in the directory.
 
 You can refer to the full documentation on [the Terraform Registry](https://registry.terraform.io/providers/fal-ai/fal/latest/docs).
+
+## Development
+
+```sh
+make test           # unit tests, plus resource tests through Terraform against a fake fal
+make generate-proto # after changing internal/isolate/controller.proto (needs protoc)
+go generate ./...   # regenerates docs/; restore the hand-written docs/index.md and docs/resources/app.md
+```

@@ -9,13 +9,13 @@ description: |-
 
 The fal Terraform Provider is used to interact with resources supported by fal. The provider needs to be configured with the proper credentials before it can be used.
 
-Using this provider, you can automate the provisioning and management of your fal infrastructure. Today you can dynamically create fal apps, configure them, and delete if necessary. We expect to add more resources to the provider later.
+Using this provider, you can automate the provisioning and management of your fal infrastructure. Today you can dynamically create fal apps, configure them, and delete if necessary, and manage environments and the secrets fal injects into apps.
 
 ~> **Warning**
-This provider leverages external binaries, which are required for it to operate. This can sometimes violate many of Terraform's assumptions (i.e. this provider will not work in HCP Terraform), so resources here are best used with care.
+`fal_app` leverages external binaries, which are required for it to operate. This can sometimes violate many of Terraform's assumptions (i.e. `fal_app` will not work in HCP Terraform), so it is best used with care. `fal_secret` and `fal_environment` call fal's API directly and need no external binaries.
 
 ## Requirements
-You will need to [install uv](https://docs.astral.sh/uv/getting-started/installation/) into your Terraform host environment.
+To manage `fal_app` resources, you will need to [install uv](https://docs.astral.sh/uv/getting-started/installation/) into your Terraform host environment.
 
 If you're running Terraform in GitHub Actions, an example of this might look like:
 ```yaml
@@ -75,3 +75,4 @@ To start using the fal Terraform Provider, you need to authenticate with fal:
 ### Optional
 
 - `fal_key` (String, Sensitive) fal's authentication key. Can also be set via the FAL_KEY environment variable.
+- `host` (String) The fal API endpoint that secrets and environments are managed through, as `host[:port]`. Defaults to `api.alpha.fal.ai`. Can also be set via the `FAL_GRPC_HOST` environment variable.

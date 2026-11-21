@@ -1,0 +1,1 @@
+terraform import fal_environment.staging staging

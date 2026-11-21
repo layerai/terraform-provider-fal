@@ -24,3 +24,15 @@ install: build
 test:
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+
+test:
+	go test ./...
+
+# Needs protoc, protoc-gen-go and protoc-gen-go-grpc on PATH.
+generate-proto:
+	protoc -I internal/isolate \
+		--go_out=internal/isolate --go_opt=paths=source_relative \
+		--go-grpc_out=internal/isolate --go-grpc_opt=paths=source_relative \
+		internal/isolate/controller.proto
+
+.PHONY: build release install test generate-proto
