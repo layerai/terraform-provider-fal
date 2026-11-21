@@ -244,6 +244,18 @@ resource "fal_environment" "staging" {
 				Check: resource.TestCheckResourceAttr("fal_environment.staging", "description", "second"),
 			},
 			{
+				// Dropping the description from the configuration keeps it.
+				Config: providerConfig(addr) + `
+resource "fal_environment" "staging" {
+  name = "staging"
+}
+`,
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectEmptyPlan()},
+				},
+				Check: resource.TestCheckResourceAttr("fal_environment.staging", "description", "second"),
+			},
+			{
 				ResourceName:      "fal_environment.staging",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -253,4 +265,32 @@ resource "fal_environment" "staging" {
 	if server.HasEnvironment("staging") {
 		t.Fatal("environment staging not destroyed")
 	}
+}
+
+func TestEnvironmentResourceImportWithoutDescription(t *testing.T) {
+	server, addr := fakefal.Start(t)
+	server.CreateEnvironmentOutOfBand("staging", "made by hand")
+	resource.UnitTest(t, resource.TestCase{
+		ProtoV6ProviderFactories: testProvider(addr),
+		Steps: []resource.TestStep{
+			{
+				// Importing without copying the description must not replace
+				// the environment, which would delete everything in it.
+				Config: providerConfig(addr) + `
+import {
+  to = fal_environment.staging
+  id = "staging"
+}
+
+resource "fal_environment" "staging" {
+  name = "staging"
+}
+`,
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{plancheck.ExpectResourceAction("fal_environment.staging", plancheck.ResourceActionNoop)},
+				},
+				Check: resource.TestCheckResourceAttr("fal_environment.staging", "description", "made by hand"),
+			},
+		},
+	})
 }
