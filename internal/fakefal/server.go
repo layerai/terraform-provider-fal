@@ -95,6 +95,14 @@ func (s *Server) DeleteSecretOutOfBand(environment, name string) {
 	delete(s.secrets[environment], name)
 }
 
+// CreateEnvironmentOutOfBand creates an environment as if someone ran
+// `fal environments create`.
+func (s *Server) CreateEnvironmentOutOfBand(name, description string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.environments[name] = &isolate.EnvironmentInfo{Name: name, Description: &description, CreatedAt: timestamppb.Now()}
+}
+
 // HasEnvironment reports whether an environment exists.
 func (s *Server) HasEnvironment(name string) bool {
 	s.mu.Lock()

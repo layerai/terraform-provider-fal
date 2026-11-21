@@ -28,7 +28,7 @@ resource "fal_environment" "staging" {
 
 ### Optional
 
-- `description` (String) A description of the environment. fal cannot change it in place, so changing it replaces the environment.
+- `description` (String) A description of the environment. When not set, Terraform leaves the environment's description as it is, so importing an environment without copying its description is safe. fal cannot change a description in place, so setting a different one replaces the environment, deleting everything in it.
 
 ### Read-Only
 
